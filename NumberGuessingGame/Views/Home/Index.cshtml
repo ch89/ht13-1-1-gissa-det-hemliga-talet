@@ -1,0 +1,73 @@
+﻿@model SecretNumber.Models.SecretNumberModel
+@using SecretNumber.Models
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Gissa det hemliga talet</h2>
+
+<form action="/" method="post">
+    @if (Model.Guess == Model.Number || Model.Count == Model.MaxNumberOfGuesses || Model == null)
+    {
+        @Html.ActionLink("Spela igen", "Index")
+    }
+    else
+    {
+        <p>Gissa på ett tal mellan 1 och 100</p>
+        @Html.LabelFor(m => m.Guess)
+        @Html.TextBoxFor(m => m.Guess)
+        <input type="submit" value="Gissa" />
+    }
+
+    @Html.ValidationSummary()
+
+    @if (Model == null)
+    {
+        <p>Sessionen har löpt ut och spelet har därmed avbrutits.</p>
+    }
+    else if (Model.Count > 0)
+    {
+        if (Model.Result == Outcome.PreviousGuess)
+        {
+            <p>Du har redan gissat på @Model.Guess</p>
+        }
+        else if (Model.Result == Outcome.High)
+        {
+            <p>Det hemliga talet är lägre än @Model.Guess</p>
+        }
+        else if (Model.Result == Outcome.Low)
+        {
+            <p>Det hemliga talet är högre än @Model.Guess</p>
+        }
+        else if (Model.Result == Outcome.Correct)
+        {
+            <p>Du gissade rätt! Det hemliga talet var @Model.Number och du klarade det på @Model.Count försök.</p>
+        }
+        else
+        {
+            <p>Slut på gissningar! Det hemliga talet var @Model.Number</p>
+        }
+        
+        <span>Tidigare gissningar: </span>
+        foreach (int guess in Model.PreviousGuesses)
+        {
+            if (guess < Model.Number)
+            {
+                <span class="low">@guess</span>
+            }
+            else if (guess > Model.Number)
+            {
+                <span class="high">@guess</span>
+            }
+            else
+            {
+                <span class="correct">@guess</span>
+            }
+        }
+    }
+</form>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
